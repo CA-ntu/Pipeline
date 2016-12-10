@@ -10,8 +10,8 @@ input               start_i;
 /* Address */
 wire    [31:0]  inst_addr, inst;
 
-wire			PC_in;
-wire			PC_out;
+wire	[31:0]	PC_in;
+wire	[31:0]	PC_out;
 
 
 /* */
@@ -33,6 +33,10 @@ assign 	Immediate[15:0] = IF_ID_inst[15:0];
 
 wire 	[31:0]	Immediate32;
 wire 	[31:0]	ShiftLeft;
+wire    [31:0]  RSdata;
+wire    [31:0]  RTdata;
+
+wire    [31:0]  Add_PC_out;
 
 
 
@@ -40,6 +44,7 @@ wire 	[31:0]	ShiftLeft;
 wire			PCWrite;
 wire   			RegWrite;
 wire 			IF_ID_Write;
+wire            Eq;
 
 
 
@@ -86,8 +91,8 @@ Registers Registers(
     .RDaddr_i   (), 
     .RDdata_i   (),
     .RegWrite_i (RegWrite), 
-    .RSdata_o   (), 
-    .RTdata_o   () 
+    .RSdata_o   (RSdata), 
+    .RTdata_o   (RTdata) 
 );
 
 Sign_Extend Sign_Extend(
@@ -99,6 +104,20 @@ Sign_Extend Sign_Extend(
 Shift_Left_2 Shift_Left_2(
 	.data_i 	(Immediate32),
 	.data_o 	(ShiftLeft)
+);
+
+Equal Equal(
+    .data1_i    (RSdata),
+    .data2_i    (RTdata),
+    .Eq_o       (Eq)
+);
+
+Adder ADD(
+    .data1_i   (ShiftLeft),
+    .data2_i   (IF_ID_PC_out),
+
+    .data_o     (Add_PC_out)
+
 );
 
 
