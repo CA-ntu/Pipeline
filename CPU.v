@@ -14,7 +14,7 @@ wire	[31:0]	PC_in;
 wire	[31:0]	PC_out;
 
 
-/* */
+/*ID*/
 wire 	[4:0]	RSaddr; // inst[25:21]
 wire 	[4:0]	RTaddr; // inst[20:16]
 wire 	[4:0]	RDaddr; // inst[15:11]
@@ -42,10 +42,18 @@ wire    [31:0]  Add_PC_out;
 
 /* Control Signal */
 wire			PCWrite;
-wire   			RegWrite;
 wire 			IF_ID_Write;
-wire            Eq;
+wire            NOP; //same as hazard_detect
 wire            RegDst;
+wire            ALUSrc;
+wire            MemtoReg;
+wire   			RegWrite;
+wire            MemWrite;
+wire            Branch;
+wire            Jump;
+wire            ExtOp;
+wire            Eq;
+wire    [1:0]   ALUOp;
 
 wire    [1:0]   ForwardA;
 wire    [1:0]   ForwardB;
@@ -71,9 +79,9 @@ wire    [4:0]   RSaddr_EX;
 wire    [4:0]   RTaddr_EX;
 wire    [4:0]   RDaddr_EX;
 
-assign  RSaddr_EX = ID_EX_RSaddr;
-assign  RTaddr_EX = ID_EX_RTaddr;
-assign  RDaddr_EX = ID_EX_RDaddr;
+assign  RSaddr_EX = ID_EX_inst[25:21];
+assign  RTaddr_EX = ID_EX_inst[20:16];
+assign  RDaddr_EX = ID_EX_inst[15:11];
 
 /* MEM */
 
@@ -96,10 +104,16 @@ reg     [31:0]	IF_ID_inst;
 reg     [31:0]  ID_EX_RSdata;
 reg     [31:0]  ID_EX_RTdata;
 reg     [31:0]  ID_EX_Immediate32;
-reg     [4:0]   ID_EX_RSaddr;
-reg     [4:0]   ID_EX_RTaddr;
-reg     [4:0]   ID_EX_RDaddr;
+reg     [31:0]  ID_EX_inst;
+reg             ID_EX_MemtoReg;
+reg             ID_EX_RegWrite;
+reg             ID_EX_MemRead;//?
+reg             ID_EX_MemWrite;
+reg             ID_EX_ALUSrc;
+reg     [1:0]   ID_EX_ALUOp;
+reg             ID/EX_RegDst;
 
+/* EX/MEM */
 
 
 
@@ -125,7 +139,18 @@ Instruction_Memory Instruction_Memory(
     .instr_o    (inst)
 );
 
-
+Control Control(
+    .op         (IF_ID_inst[31:26]),
+    .RegDst     (RegDst),
+    .ALUSrc     (ALUSrc),
+    .MemtoReg   (MemtoReg),
+    .RegWrite   (RegWrite),
+    .MemWrite   (MemWrite),
+    .Branch     (Branch), //branch?
+    .Jump       (Jump),
+    .ExtOp      (ExtOp), //memread?
+    .ALUOp      (ALUOp),
+);
 
 
 Registers Registers(
@@ -174,45 +199,71 @@ MUX5_2to1 MUX3(
 );
 
 MUX32_3to1 MUX6(
-    data1_i     (RSdata_EX),
-    data2_i     (MUX5_out),
-    data3_i     (ALU_out_MEM),
-    select_i    (ForwardA),
-    data_o      (MUX6_out)
+    .data1_i     (RSdata_EX),
+    .data2_i     (MUX5_out),
+    .data3_i     (ALU_out_MEM),
+    .select_i    (ForwardA),
+    .data_o      (MUX6_out)
 );
 
 MUX32_3to1 MUX7(
-    data1_i     (RTdata_EX),
-    data2_i     (MUX5_out),
-    data3_i     (ALU_out_MEM),
-    select_i    (ForwardB),
-    data_o      (MUX7_out)
+    .data1_i     (RTdata_EX),
+    .data2_i     (MUX5_out),
+    .data3_i     (ALU_out_MEM),
+    .select_i    (ForwardB),
+    .data_o      (MUX7_out)
 );
 
+hazard_detect HD(
+    .ID_EX_MEM_Read (), 
+    .ID_EX_RegRt  (),
+    .IF_ID_RegRs  (RSaddr),
+    .IF_ID_RegRt  (RTaddr),
+    .PC_Write     (PCWrite),
+    .IF_ID_Write  (IF_ID_Write),
+    .NOP          (NOP)
+);
 
 
 always @(posedge clk_i) begin
 
 	/* IF/ID */
-	/* 
-		TODO 
-	*/
-	// temp
-	IF_ID_inst <= inst;
-	IF_ID_PC_out <= PC_out;
-
+	if(IF_ID_Write==1) begin
+        IF_ID_inst <= inst;
+        IF_ID_PC_out <= PC_out;
+    end
+    else begin
+        //do not have to change?
+    end
     /* ID/EX */
-    /*
-        TODO : Control unit
-    */
-    // temp
+    if (NOP==0) begin //no need of mux8
+        //WB
+        ID_EX_MemtoReg <= MemtoReg;
+        ID_EX_RegWrite <= RegWrite;
+        //M
+        ID_EX_MemRead <= MemRead; //need fixed
+        ID_EX_MemWrite <= MemWrite;
+        //EX
+        ID_EX_ALUSrc <= ALUSrc;
+        ID_EX_ALUOp <= ALUOp;
+        ID/EX_RegDst <= RegDst;
+    end
+    else begin
+        ID_EX_MemtoReg <= 0;
+        ID_EX_RegWrite <= 0;
+        //M
+        ID_EX_MemRead <= 0; //need fixed
+        ID_EX_MemWrite <= 0;
+        //EX
+        ID_EX_ALUSrc <= 0;
+        ID_EX_ALUOp <= 2'b00;
+        ID/EX_RegDst <= 0;
+    end
     ID_EX_RSdata <= RSdata;
     ID_EX_RTdata <= RTdata;
     ID_EX_Immediate32 <= Immediate32;
-    ID_EX_RSaddr <= RSaddr;
-    ID_EX_RTaddr <= RTaddr;
-    ID_EX_RDaddr <= RDaddr;
-
+    ID_EX_inst <= IF_ID_inst;
+    /* EX/MEM */
 	
 	
 
