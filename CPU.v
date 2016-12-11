@@ -56,7 +56,7 @@ wire            MemRead;
 wire            MemtoReg;
 
 /* by joris need to ask*/
-wire            NOP; //same as hazard_detect
+wire            NOP; //same as stall
 wire            Branch;
 wire            Jump;
 wire            ExtOp;
@@ -322,6 +322,7 @@ always @(posedge clk_i) begin
         ID/EX_RegDst <= RegDst;
     end
     else begin
+        //WB
         ID_EX_MemtoReg <= 0;
         ID_EX_RegWrite <= 0;
         //M
