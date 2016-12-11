@@ -120,6 +120,16 @@ assign Memdata_out_WB = MEM_WB_Memdata_out;
 assign ALU_out_WB = MEM_WB_ALU_out;
 assign MUX3_out_WB = MEM_WB_MUX3_out;
 
+/* Left top */
+wire    [31:0]  MUX5_out;
+
+wire    [27:0]  26to28;
+
+wire    [31:0]  jump_addr;
+assign  jump_addr = { {MUX1_out[3:0]} , 26to28 }
+
+
+
 
 
 
@@ -320,6 +330,27 @@ Data_memory
     .Readdata_o (Memdata_out)
 );
 
+
+/* Left top */
+
+MUX32_2to1 MUX2(
+    .data1_i    (MUX1_out),
+    .data2_i    (jump_addr),     
+    .select_i   (Jump),
+    .data_o     (PC_in)
+);
+
+MUX32_2to1 MUX1(
+    .data1_i    (PC_out),
+    .data2_i    (Add_PC_out),     
+    .select_i   (Branch & Eq),
+    .data_o     (MUX1_out)
+);
+
+Shift_Left_2_26to28 Shift_Left_2_26to28(
+    .data_i     (IF_ID_inst[25:0]),
+    .data_o     (26to28)
+);
 
 
 
