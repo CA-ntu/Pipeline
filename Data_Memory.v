@@ -6,7 +6,7 @@ module Data_memory
 	MemWrite_i,
 	MemRead_i,
 	Readdata_o
-)
+);
 
 input			clk_i;
 input	[31:0]	Address_i;

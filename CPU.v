@@ -41,19 +41,27 @@ wire    [31:0]  Add_PC_out;
 
 
 /* Control Signal */
-wire			PCWrite;
-wire 			IF_ID_Write;
-wire            NOP; //same as hazard_detect
+
+
+wire            PCWrite;
+wire            RegWrite;
+wire            IF_ID_Write;
+wire            Eq;
 wire            RegDst;
 wire            ALUSrc;
-wire            MemtoReg;
-wire   			RegWrite;
+wire    [1:0]   ALUOp;
+wire            ALUCtrl;
 wire            MemWrite;
+wire            MemRead;
+wire            MemtoReg;
+
+/* by joris need to ask*/
+wire            NOP; //same as hazard_detect
 wire            Branch;
 wire            Jump;
 wire            ExtOp;
-wire            Eq;
-wire    [1:0]   ALUOp;
+
+
 
 wire    [1:0]   ForwardA;
 wire    [1:0]   ForwardB;
@@ -65,31 +73,42 @@ wire    [1:0]   ForwardB;
 wire    [31:0]  MUX4_out;
 wire    [31:0]  MUX6_out;
 wire    [31:0]  MUX7_out;
+wire    [31:0]  ALU_out;
 
 wire    [31:0]  RSdata_EX;
 wire    [31:0]  RTdata_EX;
 assign  RSdata_EX = ID_EX_RSdata;
 assign  RTdata_EX = ID_EX_RTdata;
 
-
+wire    [31:0]  Immediate32_EX;
+assign  Immediate32_EX = ID_EX_Immediate32;
 
 wire    [4:0]   MUX3_out;
 
 wire    [4:0]   RSaddr_EX;
 wire    [4:0]   RTaddr_EX;
 wire    [4:0]   RDaddr_EX;
-
-assign  RSaddr_EX = ID_EX_inst[25:21];
-assign  RTaddr_EX = ID_EX_inst[20:16];
-assign  RDaddr_EX = ID_EX_inst[15:11];
+assign  RSaddr_EX = ID_EX_RSaddr;
+assign  RTaddr_EX = ID_EX_RTaddr;
+assign  RDaddr_EX = ID_EX_RDaddr;
 
 /* MEM */
-
 wire    [31:0]  ALU_out_MEM;
+
+wire    [31:0]  Memdata_in;
+wire    [31:0]  Memdata_out;
+
+wire    [4:0]   MUX3_out_MEM;
+
 
 
 
 /* WB */
+wire    [31:0]  Memdata_out_WB;
+
+wire    [31:0]  ALU_out_WB;
+
+wire    [4:0]   MUX3_out_WB;
 
 wire    [31:0]  MUX5_out;
 
@@ -104,6 +123,11 @@ reg     [31:0]	IF_ID_inst;
 reg     [31:0]  ID_EX_RSdata;
 reg     [31:0]  ID_EX_RTdata;
 reg     [31:0]  ID_EX_Immediate32;
+reg     [4:0]   ID_EX_RSaddr;
+reg     [4:0]   ID_EX_RTaddr;
+reg     [4:0]   ID_EX_RDaddr;
+
+/* by joris need to ask*/
 reg     [31:0]  ID_EX_inst;
 reg             ID_EX_MemtoReg;
 reg             ID_EX_RegWrite;
@@ -111,9 +135,21 @@ reg             ID_EX_MemRead;
 reg             ID_EX_MemWrite;
 reg             ID_EX_ALUSrc;
 reg     [1:0]   ID_EX_ALUOp;
-reg             ID/EX_RegDst;
+reg             ID_EX_RegDst;
+
+
 
 /* EX/MEM */
+reg     [31:0]  EX_MEM_ALU_out;
+reg     [31:0]  EX_MEM_MUX7_out;
+reg     [4:0]   EX_MEM_MUX3_out;
+
+
+
+/* MEM/WB */
+reg     [31:0]  MEM_WB_ALU_out;
+reg     [31:0]  MEM_WB_Memdata_out;
+reg     [4:0]   MEM_WB_MUX3_out;
 
 
 
@@ -128,8 +164,8 @@ PC PC(
 );
 
 Adder Add_PC(
-    .data1_i   (inst_addr),
-    .data2_i   (32'd4),
+    .data1_i    (inst_addr),
+    .data2_i    (32'd4),
 
     .data_o     (PC_out)
 );
@@ -139,6 +175,7 @@ Instruction_Memory Instruction_Memory(
     .instr_o    (inst)
 );
 
+/* by joris need to ask*/
 Control Control(
     .op         (IF_ID_inst[31:26]),
     .RegDst     (RegDst),
@@ -158,8 +195,8 @@ Registers Registers(
     .clk_i      (clk_i),
     .RSaddr_i   (RSaddr),
     .RTaddr_i   (RDaddr),
-    .RDaddr_i   (), 
-    .RDdata_i   (),
+    .RDaddr_i   (MUX3_out_WB), 
+    .RDdata_i   (MUX5_out),
     .RegWrite_i (RegWrite), 
     .RSdata_o   (RSdata), 
     .RTdata_o   (RTdata) 
@@ -215,6 +252,13 @@ MUX32_3to1 MUX7(
     .data_o      (MUX7_out)
 );
 
+MUX32_2to1 MUX4(
+    .data1_i    (MUX7_out),
+    .data2_i    (Immediate32_EX),     
+    .select_i   (ALUSrc),
+    .data_o     (MUX4_out)
+);
+
 hazard_detect HD(
     .ID_EX_MEM_Read (ID_EX_MEM_Read), 
     .ID_EX_RegRt  (ID_EX_inst[20:16]),
@@ -224,6 +268,34 @@ hazard_detect HD(
     .IF_ID_Write  (IF_ID_Write),
     .NOP          (NOP)
 );
+
+/* WB */
+/* notice : MUX5's data1_i and data2_i
+            different from other MUX32_2to1 */
+
+MUX32_2to1 MUX5(
+    .data1_i    (ALU_out_WB),
+    .data2_i    (Memdata_out_WB),     
+    .select_i   (MemtoReg),
+    .data_o     (MUX5_out)
+);
+
+
+
+
+/* MEM */
+
+Data_memory
+(
+    .clk_i      (clk_i),
+    .Address_i  (ALU_out_MEM),
+    .Writedata_i(Memdata_in),
+    .MemWrite_i (MemWrite),
+    .MemRead_i  (MemRead),
+    .Readdata_o (Memdata_out)
+);
+
+
 
 
 always @(posedge clk_i) begin
@@ -263,8 +335,28 @@ always @(posedge clk_i) begin
     ID_EX_RSdata <= RSdata;
     ID_EX_RTdata <= RTdata;
     ID_EX_Immediate32 <= Immediate32;
+    ID_EX_RSaddr <= RSaddr;
+    ID_EX_RTaddr <= RTaddr;
+    ID_EX_RDaddr <= RDaddr;
     ID_EX_inst <= IF_ID_inst;
+
     /* EX/MEM */
+    /*
+        TODO : Control unit
+    */
+    // temp
+    EX_MEM_ALU_out <= ALU_out;
+    EX_MEM_MUX7_out <= MUX7_out;
+    EX_MEM_MUX3_out <= MUX3_out;
+
+    /* MEM/WB */
+    /*
+        TODO : Control unit
+    */
+    // temp
+    MEM_WB_Memdata_out <= Memdata_out;
+    MEM_WB_ALU_out <= ALU_out_MEM;
+    MEM_WB_MUX3_out <= MUX3_out_MEM;
 	
 	
 
