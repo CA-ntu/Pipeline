@@ -146,7 +146,6 @@ reg     [1:0]   ID_EX_ALUOp;
 reg             ID_EX_RegDst;
 
 
-
 /* EX/MEM */
 reg     [31:0]  EX_MEM_ALU_out;
 reg     [31:0]  EX_MEM_MUX7_out;
@@ -155,6 +154,9 @@ reg             EX_MEM_MemtoReg;
 reg             EX_MEM_RegWrite
 reg             EX_MEM_MemRead;
 reg             EX_MEM_MemWrite;
+reg     [4:0]   EX_MEM_RSaddr;
+reg     [4:0]   EX_MEM_RTaddr;
+reg     [4:0]   EX_MEM_RDaddr;
 
 
 /* MEM/WB */
@@ -203,12 +205,12 @@ Control Control(
 );
 
 forwarding_unit FU(
-    .EX_MEM_RegWrite(),
-    .EX_MEM_RegRd(),
-    .ID_EX_RegRs(),
-    .ID_EX_RegRt(),
-    .MEM_WB_RegWrite(),
-    .MEM_WB_RegRd(),
+    .EX_MEM_RegWrite(EX_MEM_RegWrite),
+    .EX_MEM_RegRd(EX_MEM_RDaddr),
+    .ID_EX_RegRs(ID_EX_RSaddr),
+    .ID_EX_RegRt(ID_EX_RTaddr),
+    .MEM_WB_RegWrite(MEM_WB_RegWrite),
+    .MEM_WB_RegRd(MEM_WB_MUX3_out),
     .Forward_A(ForwardA),
     .Forward_B(ForwardB),
 )
@@ -377,6 +379,11 @@ always @(posedge clk_i) begin
     EX_MEM_ALU_out <= ALU_out;
     EX_MEM_MUX7_out <= MUX7_out;
     EX_MEM_MUX3_out <= MUX3_out;
+    // register addr
+    EX_MEM_RSaddr <= ID_EX_RSaddr;
+    EX_MEM_RTaddr <= ID_EX_RTaddr;
+    EX_MEM_RDaddr <= ID_EX_RDaddr;
+
 
     /* MEM/WB */
     //WB
