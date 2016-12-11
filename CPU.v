@@ -191,6 +191,7 @@ assign MUX3_out_WB = MEM_WB_MUX3_out;
 PC PC(
     .clk_i      (clk_i),
     .start_i    (start_i),
+    .rst_i      (rst_i),
     .PCWrite_i	(PCWrite),
     .pc_i       (PC_in),
     .pc_o       (inst_addr)
