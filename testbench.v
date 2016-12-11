@@ -37,7 +37,8 @@ initial begin
     end
     
     // Load instructions into instruction memory
-    $readmemb("instruction.txt", CPU.Instruction_Memory.memory);
+    //$readmemb("instruction.txt", CPU.Instruction_Memory.memory);
+    $readmemb("temp.txt", CPU.Instruction_Memory.memory);
     
     // Open output file
     outfile = $fopen("output.txt") | 1;
@@ -52,6 +53,9 @@ initial begin
     #(`CYCLE_TIME/4) 
     Reset = 1;
     Start = 1;
+
+    $dumpfile("all.vcd");
+    $dumpvars;
         
     
 end

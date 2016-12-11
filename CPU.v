@@ -106,7 +106,6 @@ wire    [4:0]   MUX3_out_WB;
 wire    [31:0]  MUX5_out;
 
 
-
 /* Left top */
 wire    [31:0]  MUX1_out;
 
@@ -312,7 +311,7 @@ ALU ALU(
 	.data1      (MUX6_out),
 	.data2      (MUX4_out),
 	.ALUCtr     (ALUCtrl),
-	.dataout    (ALU_out_MEM)
+	.dataout    (ALU_out)
 );
 
 hazard_detect HD(
@@ -445,6 +444,25 @@ always @(posedge clk_i) begin
     MEM_WB_Memdata_out <= Memdata_out;
     MEM_WB_ALU_out <= ALU_out_MEM;
     MEM_WB_MUX3_out <= MUX3_out_MEM;
+
+    $display( "MUX3_out = %b,\n" , MUX3_out);
+
+    $display( "RTdata_EX = %b,\n" , RTaddr_EX);
+    $display( "RDdata_EX = %b,\n" , RDaddr_EX);
+
+
+    $display( "RSdata_EX = %d,\n" , RSdata_EX);
+    $display( "MUX5_out = %d,\n" , MUX5_out);
+    $display( "MUX6_out = %d,\n" , MUX6_out);
+    $display( "ALU_out_MEM = %d,\n" , ALU_out_MEM);
+
+    $display( "ALU_out = %d,\n" , ALU_out);
+
+    $display( "ALU_out_MEM = %d,\n" , ALU_out_MEM);
+    $display( "MEM_WB_ALU_out = %d,\n" , MEM_WB_ALU_out);
+
+    $display( "MUX3_out_WB = %b,\n" , MUX3_out_WB);
+    $display( "MUX5_out = %d,\n" , MUX5_out);
 	
  end
 
