@@ -16,14 +16,17 @@ input			MemRead_i;
 output	[31:0]	Readdata_o;
 
 reg 	[31:0]	memory 		[0:255];
+reg     [31:0]  ro;
 
 always@(*) begin
 	if (MemRead_i) begin
-		Readdata_o <= memory[Address_i];
+		ro <= memory[Address_i];
 	end
 	if (MemWrite_i) begin
 		memory[Address_i] <= Writedata_i;
 	end
 end
+
+assign Readdata_o = ro;
 
 endmodule

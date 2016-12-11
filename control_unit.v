@@ -50,7 +50,7 @@ begin
     mr = 0;
     ao = 2'b00; // Rtype
   end
-  else if(op == 6'001000) // addi
+  else if(op == 6'b001000) // addi
   begin
     rd = 0; 
     as = 1;
