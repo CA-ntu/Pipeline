@@ -46,7 +46,7 @@ begin
     ex = 0;
     ao = 2'b00; // Rtype
   end
-  else if(op == 6'b001101) // ori
+  else if(op == 6'b000001) // addi
   begin
     rd = 0; 
     as = 1;
@@ -56,9 +56,9 @@ begin
     br = 0;
     jp = 0;
     ex = 0;
-    ao = 2'b01; // or
+    ao = 2'b01; // add
   end
-  else if(op == 6'b100011) // lw
+  else if(op == 6'b000010) // lw
   begin
     rd = 0;
     as = 1;
@@ -68,9 +68,9 @@ begin
     br = 0;
     jp = 0;
     ex = 1;
-    ao =  2'b10; // Add
+    ao =  2'b01; // Add
   end
-  else if(op == 6'b101011) // sw
+  else if(op == 6'b000011) // sw
   begin
     rd = 0;
     as = 1;
@@ -80,7 +80,7 @@ begin
     br = 0;
     jp = 0;
     ex = 1;
-    ao = 2'b10; // Add
+    ao = 2'b01; // Add
   end
   else if(op == 6'b000100) // beq
   begin
@@ -92,9 +92,9 @@ begin
     br = 1;
     jp = 0;
     ex = 0;
-    ao = 2'b11; // Sub
+    ao = 2'b10; // Sub
   end 
-  else if(op == 6'b000010) // jump
+  else if(op == 6'b000101) // jump
   begin
     rd = 0;
     as = 0;
@@ -122,3 +122,4 @@ endmodule
 
   
   
+
