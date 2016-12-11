@@ -276,7 +276,7 @@ hazard_detect HD(
 MUX32_2to1 MUX5(
     .data1_i    (ALU_out_WB),
     .data2_i    (Memdata_out_WB),     
-    .select_i   (MemtoReg),
+    .select_i   (MEM_WB_MemtoReg),
     .data_o     (MUX5_out)
 );
 
@@ -290,8 +290,8 @@ Data_memory
     .clk_i      (clk_i),
     .Address_i  (ALU_out_MEM),
     .Writedata_i(Memdata_in),
-    .MemWrite_i (MemWrite),
-    .MemRead_i  (MemRead),
+    .MemWrite_i (EX_MEM_MemWrite),
+    .MemRead_i  (EX_MEM_MemRead),
     .Readdata_o (Memdata_out)
 );
 
@@ -342,23 +342,24 @@ always @(posedge clk_i) begin
     ID_EX_inst <= IF_ID_inst;
 
     /* EX/MEM */
-    /*
-        TODO : Control unit
-    */
+    //WB
+    EX_MEM_MemtoReg <= ID_EX_MemtoReg;
+    EX_MEM_RegWrite <= ID_EX_RegWrite;
+    //M
+    EX_MEM_MemRead <= ID_EXMemRead; 
+    EX_MEM_MemWrite <= ID_EX_MemWrite;
     // temp
     EX_MEM_ALU_out <= ALU_out;
     EX_MEM_MUX7_out <= MUX7_out;
     EX_MEM_MUX3_out <= MUX3_out;
 
     /* MEM/WB */
-    /*
-        TODO : Control unit
-    */
+    //WB
+    MEM_WB_MemtoReg <= EX_MEM_MemtoReg;
+    MEM_WB_RegWrite <= EX_MEM_RegWrite;
     // temp
     MEM_WB_Memdata_out <= Memdata_out;
     MEM_WB_ALU_out <= ALU_out_MEM;
     MEM_WB_MUX3_out <= MUX3_out_MEM;
 	
-	
-
-end
+ end
