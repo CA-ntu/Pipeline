@@ -107,7 +107,7 @@ reg     [31:0]  ID_EX_Immediate32;
 reg     [31:0]  ID_EX_inst;
 reg             ID_EX_MemtoReg;
 reg             ID_EX_RegWrite;
-reg             ID_EX_MemRead;//?
+reg             ID_EX_MemRead;
 reg             ID_EX_MemWrite;
 reg             ID_EX_ALUSrc;
 reg     [1:0]   ID_EX_ALUOp;
@@ -146,10 +146,11 @@ Control Control(
     .MemtoReg   (MemtoReg),
     .RegWrite   (RegWrite),
     .MemWrite   (MemWrite),
-    .Branch     (Branch), //branch?
+    .Branch     (Branch), 
     .Jump       (Jump),
-    .ExtOp      (ExtOp), //memread?
+    .ExtOp      (ExtOp), 
     .ALUOp      (ALUOp),
+    .MemRead    (MemRead)
 );
 
 
@@ -215,8 +216,8 @@ MUX32_3to1 MUX7(
 );
 
 hazard_detect HD(
-    .ID_EX_MEM_Read (), 
-    .ID_EX_RegRt  (),
+    .ID_EX_MEM_Read (ID_EX_MEM_Read), 
+    .ID_EX_RegRt  (ID_EX_inst[20:16]),
     .IF_ID_RegRs  (RSaddr),
     .IF_ID_RegRt  (RTaddr),
     .PC_Write     (PCWrite),
@@ -241,7 +242,7 @@ always @(posedge clk_i) begin
         ID_EX_MemtoReg <= MemtoReg;
         ID_EX_RegWrite <= RegWrite;
         //M
-        ID_EX_MemRead <= MemRead; //need fixed
+        ID_EX_MemRead <= MemRead; 
         ID_EX_MemWrite <= MemWrite;
         //EX
         ID_EX_ALUSrc <= ALUSrc;
@@ -252,7 +253,7 @@ always @(posedge clk_i) begin
         ID_EX_MemtoReg <= 0;
         ID_EX_RegWrite <= 0;
         //M
-        ID_EX_MemRead <= 0; //need fixed
+        ID_EX_MemRead <= 0; 
         ID_EX_MemWrite <= 0;
         //EX
         ID_EX_ALUSrc <= 0;
