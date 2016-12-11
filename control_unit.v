@@ -50,7 +50,7 @@ begin
     mr = 0;
     ao = 2'b00; // Rtype
   end
-  else if(op == 6'b000001) // addi
+  else if(op == 6'001000) // addi
   begin
     rd = 0; 
     as = 1;
@@ -63,7 +63,7 @@ begin
     mr = 0;
     ao = 2'b01; // add
   end
-  else if(op == 6'b000010) // lw
+  else if(op == 6'b100011) // lw
   begin
     rd = 0;
     as = 1;
@@ -76,7 +76,7 @@ begin
     mr = 1;
     ao =  2'b01; // Add
   end
-  else if(op == 6'b000011) // sw
+  else if(op == 6'b101011) // sw
   begin
     rd = 0;
     as = 1;
@@ -102,7 +102,7 @@ begin
     mr = 0;
     ao = 2'b10; // Sub
   end 
-  else if(op == 6'b000101) // jump
+  else if(op == 6'b000010) // jump
   begin
     rd = 0;
     as = 0;
