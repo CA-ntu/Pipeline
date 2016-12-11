@@ -161,14 +161,18 @@ reg             ID_EX_RegDst;
 reg     [31:0]  EX_MEM_ALU_out;
 reg     [31:0]  EX_MEM_MUX7_out;
 reg     [4:0]   EX_MEM_MUX3_out;
-
+reg             EX_MEM_MemtoReg;
+reg             EX_MEM_RegWrite
+reg             EX_MEM_MemRead;
+reg             EX_MEM_MemWrite;
 
 
 /* MEM/WB */
 reg     [31:0]  MEM_WB_ALU_out;
 reg     [31:0]  MEM_WB_Memdata_out;
 reg     [4:0]   MEM_WB_MUX3_out;
-
+reg             MEM_WB_MemtoReg;
+reg             MEM_WB_RegWrite;
 
 
 
@@ -208,6 +212,17 @@ Control Control(
     .MemRead    (MemRead)
 );
 
+forwarding_unit FU(
+    .EX_MEM_RegWrite(),
+    .EX_MEM_RegRd(),
+    .ID_EX_RegRs(),
+    .ID_EX_RegRt(),
+    .MEM_WB_RegWrite(),
+    .MEM_WB_RegRd(),
+    .Forward_A(ForwardA),
+    .Forward_B(ForwardB),
+)
+
 
 Registers Registers(
     .clk_i      (clk_i),
@@ -215,7 +230,7 @@ Registers Registers(
     .RTaddr_i   (RDaddr),
     .RDaddr_i   (MUX3_out_WB), 
     .RDdata_i   (MUX5_out),
-    .RegWrite_i (RegWrite), 
+    .RegWrite_i (MEM_WB_RegWrite), 
     .RSdata_o   (RSdata), 
     .RTdata_o   (RTdata) 
 );
@@ -334,6 +349,8 @@ Shift_Left_2_26to28 Shift_Left_2_26to28(
     .data_i     (IF_ID_inst[25:0]),
     .data_o     (26to28)
 );
+
+
 
 
 
