@@ -23,13 +23,6 @@ wire 	[5:0]	Funct; 		// inst[5:0]
 wire 	[15:0]	Immediate; 	// inst[15:0]
 
 
-assign	RSaddr[4:0] = IF_ID_inst[25:21];
-assign	RTaddr[4:0] = IF_ID_inst[20:16];
-assign	RDaddr[4:0] = IF_ID_inst[15:11];
-assign 	Op[5:0] = IF_ID_inst[31:26];
-assign 	Funct[5:0] = IF_ID_inst[5:0];
-assign 	Immediate[15:0] = IF_ID_inst[15:0];
-
 
 wire 	[31:0]	Immediate32;
 wire 	[31:0]	ShiftLeft32;
@@ -77,20 +70,17 @@ wire    [31:0]  ALU_out;
 
 wire    [31:0]  RSdata_EX;
 wire    [31:0]  RTdata_EX;
-assign  RSdata_EX = ID_EX_RSdata;
-assign  RTdata_EX = ID_EX_RTdata;
+
 
 wire    [31:0]  Immediate32_EX;
-assign  Immediate32_EX = ID_EX_Immediate32;
+
 
 wire    [4:0]   MUX3_out;
 
 wire    [4:0]   RSaddr_EX;
 wire    [4:0]   RTaddr_EX;
 wire    [4:0]   RDaddr_EX;
-assign  RSaddr_EX = ID_EX_RSaddr;
-assign  RTaddr_EX = ID_EX_RTaddr;
-assign  RDaddr_EX = ID_EX_RDaddr;
+
 
 /* MEM */
 wire    [31:0]  ALU_out_MEM;
@@ -100,9 +90,6 @@ wire    [31:0]  Memdata_out;
 
 wire    [4:0]   MUX3_out_MEM;
 
-assign ALU_out_MEM = EX_MEM_ALU_out;
-assign Memdata_in = EX_MEM_MUX7_out;
-assign MUX3_out_MEM = EX_MEM_MUX3_out;
 
 
 
@@ -116,9 +103,7 @@ wire    [4:0]   MUX3_out_WB;
 
 wire    [31:0]  MUX5_out;
 
-assign Memdata_out_WB = MEM_WB_Memdata_out;
-assign ALU_out_WB = MEM_WB_ALU_out;
-assign MUX3_out_WB = MEM_WB_MUX3_out;
+
 
 /* Left top */
 wire    [31:0]  MUX1_out;
@@ -126,7 +111,7 @@ wire    [31:0]  MUX1_out;
 wire    [27:0]  ShiftLeft28;
 
 wire    [31:0]  jump_addr;
-assign  jump_addr = { {MUX1_out[3:0]} , ShiftLeft28 };
+
 
 
 
@@ -176,6 +161,28 @@ reg     [4:0]   MEM_WB_MUX3_out;
 reg             MEM_WB_MemtoReg;
 reg             MEM_WB_RegWrite;
 
+
+
+
+assign  RSaddr[4:0] = IF_ID_inst[25:21];
+assign  RTaddr[4:0] = IF_ID_inst[20:16];
+assign  RDaddr[4:0] = IF_ID_inst[15:11];
+assign  Op[5:0] = IF_ID_inst[31:26];
+assign  Funct[5:0] = IF_ID_inst[5:0];
+assign  Immediate[15:0] = IF_ID_inst[15:0];
+assign  Immediate32_EX = ID_EX_Immediate32;
+assign  RSaddr_EX = ID_EX_RSaddr;
+assign  RTaddr_EX = ID_EX_RTaddr;
+assign  RDaddr_EX = ID_EX_RDaddr;
+assign ALU_out_MEM = EX_MEM_ALU_out;
+assign Memdata_in = EX_MEM_MUX7_out;
+assign MUX3_out_MEM = EX_MEM_MUX3_out;
+assign  jump_addr = { {MUX1_out[3:0]} , ShiftLeft28 };
+assign  RSdata_EX = ID_EX_RSdata;
+assign  RTdata_EX = ID_EX_RTdata;
+assign Memdata_out_WB = MEM_WB_Memdata_out;
+assign ALU_out_WB = MEM_WB_ALU_out;
+assign MUX3_out_WB = MEM_WB_MUX3_out;
 
 
 
@@ -437,3 +444,5 @@ always @(posedge clk_i) begin
     MEM_WB_MUX3_out <= MUX3_out_MEM;
 	
  end
+
+ endmodule
