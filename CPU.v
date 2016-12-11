@@ -120,6 +120,16 @@ assign Memdata_out_WB = MEM_WB_Memdata_out;
 assign ALU_out_WB = MEM_WB_ALU_out;
 assign MUX3_out_WB = MEM_WB_MUX3_out;
 
+/* Left top */
+wire    [31:0]  MUX5_out;
+
+wire    [27:0]  26to28;
+
+wire    [31:0]  jump_addr;
+assign  jump_addr = { {MUX1_out[3:0]} , 26to28 }
+
+
+
 
 
 
@@ -146,7 +156,6 @@ reg     [1:0]   ID_EX_ALUOp;
 reg             ID_EX_RegDst;
 
 
-
 /* EX/MEM */
 reg     [31:0]  EX_MEM_ALU_out;
 reg     [31:0]  EX_MEM_MUX7_out;
@@ -155,6 +164,9 @@ reg             EX_MEM_MemtoReg;
 reg             EX_MEM_RegWrite
 reg             EX_MEM_MemRead;
 reg             EX_MEM_MemWrite;
+reg     [4:0]   EX_MEM_RSaddr;
+reg     [4:0]   EX_MEM_RTaddr;
+reg     [4:0]   EX_MEM_RDaddr;
 
 
 /* MEM/WB */
@@ -201,6 +213,17 @@ Control Control(
     .ALUOp      (ALUOp),
     .MemRead    (MemRead)
 );
+
+forwarding_unit FU(
+    .EX_MEM_RegWrite(EX_MEM_RegWrite),
+    .EX_MEM_RegRd(EX_MEM_RDaddr),
+    .ID_EX_RegRs(ID_EX_RSaddr),
+    .ID_EX_RegRt(ID_EX_RTaddr),
+    .MEM_WB_RegWrite(MEM_WB_RegWrite),
+    .MEM_WB_RegRd(MEM_WB_MUX3_out),
+    .Forward_A(ForwardA),
+    .Forward_B(ForwardB),
+)
 
 
 Registers Registers(
@@ -320,6 +343,29 @@ Data_memory
 );
 
 
+/* Left top */
+
+MUX32_2to1 MUX2(
+    .data1_i    (MUX1_out),
+    .data2_i    (jump_addr),     
+    .select_i   (Jump),
+    .data_o     (PC_in)
+);
+
+MUX32_2to1 MUX1(
+    .data1_i    (PC_out),
+    .data2_i    (Add_PC_out),     
+    .select_i   (Branch & Eq),
+    .data_o     (MUX1_out)
+);
+
+Shift_Left_2_26to28 Shift_Left_2_26to28(
+    .data_i     (IF_ID_inst[25:0]),
+    .data_o     (26to28)
+);
+
+
+
 
 
 always @(posedge clk_i) begin
@@ -376,6 +422,11 @@ always @(posedge clk_i) begin
     EX_MEM_ALU_out <= ALU_out;
     EX_MEM_MUX7_out <= MUX7_out;
     EX_MEM_MUX3_out <= MUX3_out;
+    // register addr
+    EX_MEM_RSaddr <= ID_EX_RSaddr;
+    EX_MEM_RTaddr <= ID_EX_RTaddr;
+    EX_MEM_RDaddr <= ID_EX_RDaddr;
+
 
     /* MEM/WB */
     //WB
