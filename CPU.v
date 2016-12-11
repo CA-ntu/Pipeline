@@ -225,11 +225,11 @@ control_unit Control(
 
 forwarding_unit FU(
     .EX_MEM_RegWrite(EX_MEM_RegWrite),
-    .EX_MEM_RegRd(EX_MEM_RDaddr),
-    .ID_EX_RegRs(ID_EX_RSaddr),
-    .ID_EX_RegRt(ID_EX_RTaddr),
+    .EX_MEM_RegRd(MUX3_out_MEM),
+    .ID_EX_RegRs(RSaddr_EX),
+    .ID_EX_RegRt(RTaddr_EX),
     .MEM_WB_RegWrite(MEM_WB_RegWrite),
-    .MEM_WB_RegRd(MEM_WB_MUX3_out),
+    .MEM_WB_RegRd(MUX3_out_WB),
     .Forward_A(ForwardA),
     .Forward_B(ForwardB)
 );
@@ -374,7 +374,7 @@ Shift_Left_2_26to28 Shift_Left_2_26to28(
 
 
 
-
+reg     [31:0]      register        [0:31];
 
 always @(posedge clk_i) begin
 
@@ -447,16 +447,47 @@ always @(posedge clk_i) begin
 
     $display( "MUX3_out = %b,\n" , MUX3_out);
 
-    $display( "RTdata_EX = %b,\n" , RTaddr_EX);
-    $display( "RDdata_EX = %b,\n" , RDaddr_EX);
+    $display( "RTaddr_EX = %b,\n" , RTaddr_EX);
+    $display( "RDaddr_EX = %b,\n" , RDaddr_EX);
 
+    $display( "RSaddr = %b,\n" , RSaddr);
+    $display( "RTaddr = %b,\n" , RTaddr);
 
+    $display( "register[RTaddr] = %b,\n" , register[RTaddr]);
+
+    
+
+    $display( "RSdata = %d,\n" , RSdata);
+    $display( "RTdata = %d,\n" , RTdata);
+
+    $display( "ID_EX_RSdata = %d,\n" , ID_EX_RSdata);
+    $display( "ID_EX_RTdata = %d,\n" , ID_EX_RTdata);
+
+    $display( "MUX7_out = %d,\n" , MUX7_out);
+    
+
+    $display( "MUX4_out = %d,\n" , MUX4_out);
+    $display( "MUX6_out = %d,\n" , MUX6_out);
     $display( "RSdata_EX = %d,\n" , RSdata_EX);
     $display( "MUX5_out = %d,\n" , MUX5_out);
-    $display( "MUX6_out = %d,\n" , MUX6_out);
     $display( "ALU_out_MEM = %d,\n" , ALU_out_MEM);
+    $display( "ForwardA = %b,\n" , ForwardA);
+    $display( "ForwardB = %b,\n" , ForwardB);
+
+    $display( "/* for forward */");
+    $display( "RTaddr_EX = %b,\n" , RTaddr_EX);
+    $display( "RDaddr_EX = %b,\n" , RDaddr_EX);
+    $display( "MUX3_out_MEM = %b,\n" , MUX3_out_MEM);
+    $display( "MUX3_out_WB = %b,\n" , MUX3_out_WB);
+
+
+
+
 
     $display( "ALU_out = %d,\n" , ALU_out);
+
+    $display( "MUX3_out_MEM = %b,\n" , MUX3_out_MEM);
+    $display( "MEM_WB_MUX3_out = %b,\n" , MEM_WB_MUX3_out);
 
     $display( "ALU_out_MEM = %d,\n" , ALU_out_MEM);
     $display( "MEM_WB_ALU_out = %d,\n" , MEM_WB_ALU_out);
