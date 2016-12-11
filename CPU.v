@@ -50,7 +50,7 @@ wire            Eq;
 wire            RegDst;
 wire            ALUSrc;
 wire    [1:0]   ALUOp;
-wire            ALUCtrl;
+wire    [2:0]   ALUCtrl;
 wire            MemWrite;
 wire            MemRead;
 wire            MemtoReg;
@@ -244,7 +244,7 @@ Adder ADD(
 MUX5_2to1 MUX3(
     .data1_i    (RTdata_EX),
     .data2_i    (RDaddr_EX),     
-    .select_i   (RegDst),
+    .select_i   (ID_EX_RegDst),
     .data_o     (MUX3_out)
 );
 
@@ -267,8 +267,19 @@ MUX32_3to1 MUX7(
 MUX32_2to1 MUX4(
     .data1_i    (MUX7_out),
     .data2_i    (Immediate32_EX),     
-    .select_i   (ALUSrc),
+    .select_i   (ID_EX_ALUSrc),
     .data_o     (MUX4_out)
+);
+ALUCtr_unit ALUCtr_unit(
+	.ALUOp      (ID_EX_ALUOp),
+	.func       (ID_EX_inst[5:0]),
+	.ALUCtr     (ALUCtrl)
+);
+ALU ALU(
+	.data1      (MUX6_out),
+	.data2      (MUX4_out),
+	.ALUCtr     (ALUCtrl),
+	.dataout    (ALU_out_MEM)
 );
 
 hazard_detect HD(
@@ -280,6 +291,7 @@ hazard_detect HD(
     .IF_ID_Write  (IF_ID_Write),
     .NOP          (NOP)
 );
+
 
 /* WB */
 /* notice : MUX5's data1_i and data2_i
