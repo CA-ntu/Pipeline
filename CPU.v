@@ -100,6 +100,10 @@ wire    [31:0]  Memdata_out;
 
 wire    [4:0]   MUX3_out_MEM;
 
+assign ALU_out_MEM = EX_MEM_ALU_out;
+assign Memdata_in = EX_MEM_MUX7_out;
+assign MUX3_out_MEM = EX_MEM_MUX3_out;
+
 
 
 
@@ -111,6 +115,10 @@ wire    [31:0]  ALU_out_WB;
 wire    [4:0]   MUX3_out_WB;
 
 wire    [31:0]  MUX5_out;
+
+assign Memdata_out_WB = MEM_WB_Memdata_out;
+assign ALU_out_WB = MEM_WB_ALU_out;
+assign MUX3_out_WB = MEM_WB_MUX3_out;
 
 
 
