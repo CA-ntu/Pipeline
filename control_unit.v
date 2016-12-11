@@ -9,6 +9,7 @@ module control_unit(
   Jump,
   ExtOp,
   ALUOp,
+  MemRead
 );
 
 input[5:0] op;
@@ -20,6 +21,7 @@ output MemWrite;
 output Branch;
 output Jump;
 output ExtOp;
+output MemRead;
 output[1:0] ALUOp;
 
 reg rd;
@@ -30,6 +32,7 @@ reg mw;
 reg br;
 reg jp;
 reg ex;
+reg mr;
 reg[1:0] ao;
 
 always@(*)
@@ -44,6 +47,7 @@ begin
     br = 0;
     jp = 0;
     ex = 0;
+    mr = 0;
     ao = 2'b00; // Rtype
   end
   else if(op == 6'b000001) // addi
@@ -56,6 +60,7 @@ begin
     br = 0;
     jp = 0;
     ex = 0;
+    mr = 0;
     ao = 2'b01; // add
   end
   else if(op == 6'b000010) // lw
@@ -68,6 +73,7 @@ begin
     br = 0;
     jp = 0;
     ex = 1;
+    mr = 1;
     ao =  2'b01; // Add
   end
   else if(op == 6'b000011) // sw
@@ -80,6 +86,7 @@ begin
     br = 0;
     jp = 0;
     ex = 1;
+    mr = 0;
     ao = 2'b01; // Add
   end
   else if(op == 6'b000100) // beq
@@ -92,6 +99,7 @@ begin
     br = 1;
     jp = 0;
     ex = 0;
+    mr = 0;
     ao = 2'b10; // Sub
   end 
   else if(op == 6'b000101) // jump
@@ -104,6 +112,7 @@ begin
     br = 0;
     jp = 1;
     ex = 0;
+    mr = 0;
     ao = 2'bxx;
   end
 end
@@ -117,6 +126,7 @@ assign Branch = br;
 assign Jump = jp;
 assign ExtOp = ex;
 assign ALUOp = ao;
+assign MemRead = mr;
 
 endmodule
 
