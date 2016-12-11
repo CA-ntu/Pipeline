@@ -32,7 +32,7 @@ assign 	Immediate[15:0] = IF_ID_inst[15:0];
 
 
 wire 	[31:0]	Immediate32;
-wire 	[31:0]	ShiftLeft;
+wire 	[31:0]	ShiftLeft32;
 wire    [31:0]  RSdata;
 wire    [31:0]  RTdata;
 
@@ -121,12 +121,12 @@ assign ALU_out_WB = MEM_WB_ALU_out;
 assign MUX3_out_WB = MEM_WB_MUX3_out;
 
 /* Left top */
-wire    [31:0]  MUX5_out;
+wire    [31:0]  MUX1_out;
 
-wire    [27:0]  26to28;
+wire    [27:0]  ShiftLeft28;
 
 wire    [31:0]  jump_addr;
-assign  jump_addr = { {MUX1_out[3:0]} , 26to28 }
+assign  jump_addr = { {MUX1_out[3:0]} , ShiftLeft28 };
 
 
 
@@ -161,7 +161,7 @@ reg     [31:0]  EX_MEM_ALU_out;
 reg     [31:0]  EX_MEM_MUX7_out;
 reg     [4:0]   EX_MEM_MUX3_out;
 reg             EX_MEM_MemtoReg;
-reg             EX_MEM_RegWrite
+reg             EX_MEM_RegWrite;
 reg             EX_MEM_MemRead;
 reg             EX_MEM_MemWrite;
 reg     [4:0]   EX_MEM_RSaddr;
@@ -222,8 +222,8 @@ forwarding_unit FU(
     .MEM_WB_RegWrite(MEM_WB_RegWrite),
     .MEM_WB_RegRd(MEM_WB_MUX3_out),
     .Forward_A(ForwardA),
-    .Forward_B(ForwardB),
-)
+    .Forward_B(ForwardB)
+);
 
 
 Registers Registers(
@@ -245,7 +245,7 @@ Sign_Extend Sign_Extend(
 
 Shift_Left_2 Shift_Left_2(
 	.data_i 	(Immediate32),
-	.data_o 	(ShiftLeft)
+	.data_o 	(ShiftLeft32)
 );
 
 Equal Equal(
@@ -255,7 +255,7 @@ Equal Equal(
 );
 
 Adder ADD(
-    .data1_i    (ShiftLeft),
+    .data1_i    (ShiftLeft32),
     .data2_i    (IF_ID_PC_out),
 
     .data_o     (Add_PC_out)
@@ -332,8 +332,7 @@ MUX32_2to1 MUX5(
 
 /* MEM */
 
-Data_memory
-(
+Data_Memory Data_Memory(
     .clk_i      (clk_i),
     .Address_i  (ALU_out_MEM),
     .Writedata_i(Memdata_in),
@@ -361,7 +360,7 @@ MUX32_2to1 MUX1(
 
 Shift_Left_2_26to28 Shift_Left_2_26to28(
     .data_i     (IF_ID_inst[25:0]),
-    .data_o     (26to28)
+    .data_o     (ShiftLeft28)
 );
 
 
@@ -416,7 +415,7 @@ always @(posedge clk_i) begin
     EX_MEM_MemtoReg <= ID_EX_MemtoReg;
     EX_MEM_RegWrite <= ID_EX_RegWrite;
     //M
-    EX_MEM_MemRead <= ID_EXMemRead; 
+    EX_MEM_MemRead <= ID_EX_MemRead; 
     EX_MEM_MemWrite <= ID_EX_MemWrite;
     // temp
     EX_MEM_ALU_out <= ALU_out;

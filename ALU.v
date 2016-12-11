@@ -28,7 +28,7 @@ end
 
 assign dataout = do;
 
-endmodule;
+endmodule
 
 
 

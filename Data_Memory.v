@@ -1,4 +1,4 @@
-module Data_memory
+module Data_Memory
 (
 	clk_i,
 	Address_i,
