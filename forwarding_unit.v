@@ -1,4 +1,4 @@
-module Forwarding_Unit(
+module forwarding_unit(
   EX_MEM_RegWrite,
   EX_MEM_RegRd,
   ID_EX_RegRs,

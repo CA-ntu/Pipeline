@@ -207,7 +207,7 @@ Instruction_Memory Instruction_Memory(
 );
 
 /* by joris need to ask*/
-Control Control(
+control_unit Control(
     .op         (IF_ID_inst[31:26]),
     .RegDst     (RegDst),
     .ALUSrc     (ALUSrc),
@@ -272,7 +272,7 @@ Adder ADD(
 
 
 MUX5_2to1 MUX3(
-    .data1_i    (RTdata_EX),
+    .data1_i    (RTaddr_EX),
     .data2_i    (RDaddr_EX),     
     .select_i   (ID_EX_RegDst),
     .data_o     (MUX3_out)

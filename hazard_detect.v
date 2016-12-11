@@ -42,7 +42,3 @@ assign IF_ID_Write = ifid;
 assign NOP = nop;
 
 endmodule
-    
-  
-  
-  
