@@ -198,6 +198,17 @@ Control Control(
     .MemRead    (MemRead)
 );
 
+forwarding_unit FU(
+    .EX_MEM_RegWrite(),
+    .EX_MEM_RegRd(),
+    .ID_EX_RegRs(),
+    .ID_EX_RegRt(),
+    .MEM_WB_RegWrite(),
+    .MEM_WB_RegRd(),
+    .Forward_A(ForwardA),
+    .Forward_B(ForwardB),
+)
+
 
 Registers Registers(
     .clk_i      (clk_i),
@@ -302,6 +313,8 @@ Data_memory
     .MemRead_i  (EX_MEM_MemRead),
     .Readdata_o (Memdata_out)
 );
+
+
 
 
 
