@@ -1,10 +1,12 @@
 module CPU
 (
 	clk_i,
+    rst_i,
     start_i
 );
 
-input               clk_i;
+input               clk_i;  
+input               rst_i;
 input               start_i;
 
 /* Address */
