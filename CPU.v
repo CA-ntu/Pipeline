@@ -327,7 +327,7 @@ always @(posedge clk_i) begin
         //EX
         ID_EX_ALUSrc <= ALUSrc;
         ID_EX_ALUOp <= ALUOp;
-        ID/EX_RegDst <= RegDst;
+        ID_EX_RegDst <= RegDst;
     end
     else begin
         //WB
@@ -339,7 +339,7 @@ always @(posedge clk_i) begin
         //EX
         ID_EX_ALUSrc <= 0;
         ID_EX_ALUOp <= 2'b00;
-        ID/EX_RegDst <= 0;
+        ID_EX_RegDst <= 0;
     end
     ID_EX_RSdata <= RSdata;
     ID_EX_RTdata <= RTdata;
