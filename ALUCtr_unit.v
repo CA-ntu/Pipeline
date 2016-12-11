@@ -21,7 +21,7 @@ always@(*)
 begin
   if(ALUOp == 2'b00) // Rtype
   begin
-  	if(func == 6'b100000) // add
+  	if(func == 6'b100000 || func == 6'b000000) // add
   		ac = 3'b000;
   	else if(func == 6'b100010) // sub
   		ac = 3'b001;

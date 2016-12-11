@@ -26,6 +26,7 @@ always@(posedge clk_i or negedge rst_i) begin
     end
     
     else if(~PCWrite_i) begin
+        pc_o <= pc_o;
     end
     
     else begin

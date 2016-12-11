@@ -22,8 +22,8 @@ reg nop;
 always@(*)
 begin
   if(ID_EX_MEM_Read &&
-     ID_EX_RegRt == IF_ID_RegRs &&
-     ID_EX_RegRt == IF_ID_RegRt)
+     (ID_EX_RegRt == IF_ID_RegRs ||
+     ID_EX_RegRt == IF_ID_RegRt))
      begin
        pc = 0;
        ifid = 0;

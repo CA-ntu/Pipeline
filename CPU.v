@@ -178,7 +178,7 @@ assign  RDaddr_EX = ID_EX_RDaddr;
 assign ALU_out_MEM = EX_MEM_ALU_out;
 assign Memdata_in = EX_MEM_MUX7_out;
 assign MUX3_out_MEM = EX_MEM_MUX3_out;
-assign  jump_addr = { {MUX1_out[3:0]} , ShiftLeft28 };
+assign  jump_addr = { {MUX1_out[31:28]} , ShiftLeft28 };
 assign  RSdata_EX = ID_EX_RSdata;
 assign  RTdata_EX = ID_EX_RTdata;
 assign Memdata_out_WB = MEM_WB_Memdata_out;
@@ -238,7 +238,7 @@ forwarding_unit FU(
 Registers Registers(
     .clk_i      (clk_i),
     .RSaddr_i   (RSaddr),
-    .RTaddr_i   (RDaddr),
+    .RTaddr_i   (RTaddr),
     .RDaddr_i   (MUX3_out_WB), 
     .RDdata_i   (MUX5_out),
     .RegWrite_i (MEM_WB_RegWrite), 
@@ -315,8 +315,8 @@ ALU ALU(
 );
 
 hazard_detect HD(
-    .ID_EX_MEM_Read (ID_EX_MEM_Read), 
-    .ID_EX_RegRt  (ID_EX_inst[20:16]),
+    .ID_EX_MEM_Read (ID_EX_MemRead), 
+    .ID_EX_RegRt  (RTaddr_EX),
     .IF_ID_RegRs  (RSaddr),
     .IF_ID_RegRt  (RTaddr),
     .PC_Write     (PCWrite),
@@ -383,9 +383,39 @@ always @(posedge clk_i) begin
         IF_ID_inst <= inst;
         IF_ID_PC_out <= PC_out;
     end
-    else begin
-        //do not have to change?
+    if ((Branch && Eq) || Jump) begin
+        IF_ID_inst <= 32'h00000000;
+        IF_ID_PC_out <= 32'h00000000;
+        $display( "In jump or branch");
+        $display( "In jump or branch");
+        $display( "In jump or branch");
+        $display( "In jump or branch");
+        $display( "In jump or branch");
+        $display( "In jump or branch");
+        $display( "In jump or branch");
     end
+    /*
+    $display( "ID_EX_MemRead = %b\n" , ID_EX_MemRead);
+    $display( "RTaddr_EX = %b\n" , RTaddr_EX);
+    $display( "RSaddr = %b\n" , RSaddr);
+    $display( "RTaddr = %b\n" , RTaddr);
+    $display( "PCWrite = %b\n" , PCWrite);
+    $display( "IF_ID_Write = %b\n" , IF_ID_Write);
+    $display( "NOP = %b\n" , NOP);
+    */
+
+    $display( "Jump = %b\n" , Jump);
+    $display( "Branch = %b\n" , Branch);
+
+    $display( "IF_ID_inst = %b\n" , IF_ID_inst);
+    $display( "ShiftLeft28 = %b\n" , ShiftLeft28);
+    $display( "MUX1_out = %b\n" , MUX1_out);
+    $display( "jump_addr = %b\n" , jump_addr);
+
+
+
+   
+
     /* ID/EX */
     if (NOP==0) begin //no need of mux8
         //WB
@@ -445,6 +475,8 @@ always @(posedge clk_i) begin
     MEM_WB_ALU_out <= ALU_out_MEM;
     MEM_WB_MUX3_out <= MUX3_out_MEM;
 
+    /*
+
     $display( "MUX3_out = %b,\n" , MUX3_out);
 
     $display( "RTaddr_EX = %b,\n" , RTaddr_EX);
@@ -474,7 +506,7 @@ always @(posedge clk_i) begin
     $display( "ForwardA = %b,\n" , ForwardA);
     $display( "ForwardB = %b,\n" , ForwardB);
 
-    $display( "/* for forward */");
+    
     $display( "RTaddr_EX = %b,\n" , RTaddr_EX);
     $display( "RDaddr_EX = %b,\n" , RDaddr_EX);
     $display( "MUX3_out_MEM = %b,\n" , MUX3_out_MEM);
@@ -493,7 +525,27 @@ always @(posedge clk_i) begin
     $display( "MEM_WB_ALU_out = %d,\n" , MEM_WB_ALU_out);
 
     $display( "MUX3_out_WB = %b,\n" , MUX3_out_WB);
+    $display( "MUX5_out = %d,\n" , MUX5_out);*/
+
+    $display( "RSdata = %d,\n" , RSdata);
+    $display( "RTdata = %d,\n" , RTdata);
+
+    $display( "ID_EX_RSdata = %d,\n" , ID_EX_RSdata);
+    $display( "ID_EX_RTdata = %d,\n" , ID_EX_RTdata);
+
+    $display( "MUX7_out = %d,\n" , MUX7_out);
+    
+
+    $display( "MUX4_out = %d,\n" , MUX4_out);
+    $display( "MUX6_out = %d,\n" , MUX6_out);
+    $display( "RSdata_EX = %d,\n" , RSdata_EX);
+    $display( "RTdata_EX = %d,\n" , RTdata_EX);
     $display( "MUX5_out = %d,\n" , MUX5_out);
+    $display( "ALU_out_MEM = %d,\n" , ALU_out_MEM);
+    $display( "ForwardA = %b,\n" , ForwardA);
+    $display( "ForwardB = %b,\n" , ForwardB);
+
+    $display( "MUX3_out_WB = %b\n" , MUX3_out_WB);
 	
  end
 
