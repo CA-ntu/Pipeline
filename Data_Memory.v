@@ -1,6 +1,7 @@
 module Data_Memory
 (
 	clk_i,
+	rst_i,
 	Address_i,
 	Writedata_i,
 	MemWrite_i,
@@ -9,6 +10,7 @@ module Data_Memory
 );
 
 input			clk_i;
+input			rst_i;
 input	[31:0]	Address_i;
 input	[31:0]	Writedata_i;
 input			MemWrite_i;
@@ -27,5 +29,15 @@ always@(*) begin
 	end
 end
 
+/*
+always@(posedge clk_i or negedge rst_i) begin
+	if (MemWrite_i && clk_i) begin
+		memory[Address_i] = Writedata_i;
+	end
+	if (MemRead_i && rst_i) begin
+		Readdata_o = memory[Address_i];
+	end
+end
+*/
 
 endmodule

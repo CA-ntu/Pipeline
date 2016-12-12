@@ -162,6 +162,9 @@ reg     [4:0]   MEM_WB_MUX3_out;
 reg             MEM_WB_MemtoReg;
 reg             MEM_WB_RegWrite;
 
+wire            RegWrite_WB;
+
+
 
 
 
@@ -184,6 +187,7 @@ assign  RTdata_EX = ID_EX_RTdata;
 assign Memdata_out_WB = MEM_WB_Memdata_out;
 assign ALU_out_WB = MEM_WB_ALU_out;
 assign MUX3_out_WB = MEM_WB_MUX3_out;
+assign RegWrite_WB = MEM_WB_RegWrite;
 
 
 
@@ -228,7 +232,7 @@ forwarding_unit FU(
     .EX_MEM_RegRd(MUX3_out_MEM),
     .ID_EX_RegRs(RSaddr_EX),
     .ID_EX_RegRt(RTaddr_EX),
-    .MEM_WB_RegWrite(MEM_WB_RegWrite),
+    .MEM_WB_RegWrite(RegWrite_WB),
     .MEM_WB_RegRd(MUX3_out_WB),
     .Forward_A(ForwardA),
     .Forward_B(ForwardB)
@@ -237,11 +241,12 @@ forwarding_unit FU(
 
 Registers Registers(
     .clk_i      (clk_i),
+    .rst_i      (rst_i),
     .RSaddr_i   (RSaddr),
     .RTaddr_i   (RTaddr),
     .RDaddr_i   (MUX3_out_WB), 
     .RDdata_i   (MUX5_out),
-    .RegWrite_i (MEM_WB_RegWrite), 
+    .RegWrite_i (RegWrite_WB), 
     .RSdata_o   (RSdata), 
     .RTdata_o   (RTdata) 
 );
@@ -343,6 +348,7 @@ MUX32_2to1 MUX5(
 
 Data_Memory Data_Memory(
     .clk_i      (clk_i),
+    .rst_i      (rst_i),
     .Address_i  (ALU_out_MEM),
     .Writedata_i(Memdata_in),
     .MemWrite_i (EX_MEM_MemWrite),
@@ -404,13 +410,13 @@ always @(posedge clk_i) begin
     $display( "NOP = %b\n" , NOP);
     */
 
-    $display( "Jump = %b\n" , Jump);
+    /*$display( "Jump = %b\n" , Jump);
     $display( "Branch = %b\n" , Branch);
 
     $display( "IF_ID_inst = %b\n" , IF_ID_inst);
     $display( "ShiftLeft28 = %b\n" , ShiftLeft28);
     $display( "MUX1_out = %b\n" , MUX1_out);
-    $display( "jump_addr = %b\n" , jump_addr);
+    $display( "jump_addr = %b\n" , jump_addr);*/
 
 
 
@@ -525,7 +531,7 @@ always @(posedge clk_i) begin
     $display( "MEM_WB_ALU_out = %d,\n" , MEM_WB_ALU_out);
 
     $display( "MUX3_out_WB = %b,\n" , MUX3_out_WB);
-    $display( "MUX5_out = %d,\n" , MUX5_out);*/
+    $display( "MUX5_out = %d,\n" , MUX5_out);
 
     $display( "RSdata = %d,\n" , RSdata);
     $display( "RTdata = %d,\n" , RTdata);
@@ -545,7 +551,9 @@ always @(posedge clk_i) begin
     $display( "ForwardA = %b,\n" , ForwardA);
     $display( "ForwardB = %b,\n" , ForwardB);
 
-    $display( "MUX3_out_WB = %b\n" , MUX3_out_WB);
+    $display( "MUX3_out_WB = %b\n" , MUX3_out_WB);*/
+
+    
 	
  end
 

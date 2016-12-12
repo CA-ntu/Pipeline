@@ -61,12 +61,16 @@ initial begin
 end
   
 always@(posedge Clk) begin
-    if(counter == 30)    // stop after 30 cycles
+    if(counter == 80)    // stop after 30 cycles
         $stop;
 
     // put in your own signal to count stall and flush
     // if(CPU.HazzardDetection.mux8_o == 1 && CPU.Control.Jump_o == 0 && CPU.Control.Branch_o == 0)stall = stall + 1;
-    // if(CPU.HazzardDetection.Flush_o == 1)flush = flush + 1;  
+    // if(CPU.HazzardDetection.Flush_o == 1)flush = flush + 1;
+     if(CPU.NOP == 1 && CPU.Jump == 0 && CPU.Branch == 0)
+        stall = stall + 1;
+     if((CPU.Branch && CPU.Eq) || CPU.Jump)
+        flush = flush + 1;  
 
     // print PC
     $fdisplay(outfile, "cycle = %d, Start = %d, Stall = %d, Flush = %d\nPC = %d", counter, Start, stall, flush, CPU.PC.pc_o);
@@ -93,6 +97,8 @@ always@(posedge Clk) begin
     $fdisplay(outfile, "Data Memory: 0x1c = %d", {CPU.Data_Memory.memory[31], CPU.Data_Memory.memory[30], CPU.Data_Memory.memory[29], CPU.Data_Memory.memory[28]});
 	
     $fdisplay(outfile, "\n");
+
+    
     
     counter = counter + 1;
     
